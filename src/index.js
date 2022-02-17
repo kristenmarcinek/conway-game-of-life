@@ -27,7 +27,7 @@ function render(data) {
   }
 }
 
-let SIZE = 25;
+let SIZE = 100;
 
 function create2dArr(randomize = false) {
   return Array(SIZE)
@@ -48,11 +48,60 @@ function create2dArr(randomize = false) {
 let data = create2dArr(true);
 
 function countLiveNeighbors(x, y) {
-  data[y][x];
+  let neighborLocations = [
+    [x, y + 1],
+    [x + 1, y + 1],
+    [x + 1, y],
+    [x + 1, y - 1],
+    [x, y - 1],
+    [x - 1, y - 1],
+    [x - 1, y],
+    [x - 1, y + 1]
+  ];
+
+  let sum = 0;
+
+  neighborLocations.forEach(function (location) {
+    let x = location[0];
+    let y = location[1];
+
+    if (data[y] !== undefined && data[y][x] === 1) {
+      sum++;
+    }
+  });
+
+  return sum;
 }
 
 function nextGeneration() {
   let newData = create2dArr();
+
+  for (let y = 0; y < SIZE; y++) {
+    for (let x = 0; x < SIZE; x++) {
+      let sum = countLiveNeighbors(x, y);
+      let isLive = data[y][x] === 1;
+
+      if (isLive) {
+        if (sum < 2 || sum > 3) {
+          newData[y][x] = 0;
+        } else {
+          newData[y][x] = 1;
+        }
+      } else {
+        if (sum === 3) {
+          newData[y][x] = 1;
+        } else {
+          newData[y][x] = 0;
+        }
+      }
+    }
+  }
+  data = newData;
 }
 
 render(data);
+
+setInterval(function () {
+  nextGeneration();
+  render(data);
+}, 200);
